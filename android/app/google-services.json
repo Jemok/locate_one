@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "1086208063962",
+    "firebase_url": "https://locatedev-1477989978418.firebaseio.com",
+    "project_id": "locatedev-1477989978418",
+    "storage_bucket": "locatedev-1477989978418.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086208063962:android:5a894ecd2dbfc313",
+        "android_client_info": {
+          "package_name": "com.locate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086208063962-ikupthri3moqdcfe3as3b2kk58s90r7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQS3N6WNyzW1XLbXVoBdwbCTKlZcsMRjo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086208063962:android:9cdf7e21d8a7770c",
+        "android_client_info": {
+          "package_name": "com.locateone"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086208063962-ikupthri3moqdcfe3as3b2kk58s90r7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQS3N6WNyzW1XLbXVoBdwbCTKlZcsMRjo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

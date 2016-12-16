@@ -42,6 +42,8 @@ import {
   setMyAgentDetails
 } from '../actions';
 
+import FCM from 'react-native-fcm';
+
 // import SplashScreen from 'react-native-splash-screen';
 
 class SetAgent extends Component {
@@ -82,6 +84,41 @@ class SetAgent extends Component {
           });
         }
       }).catch(error => console.log('Failure'));
+
+      FCM.requestPermissions();
+
+    FCM.getFCMToken().then(token => {
+      console.log("TOKEN (getFCMToken)", token);
+      //this.props.onChangeToken(token);
+    });
+
+    FCM.getInitialNotification().then(notif => {
+      console.log("INITIAL NOTIFICATION", notif)
+    });
+
+    this.notificationUnsubscribe = FCM.on("notification", notif => {
+      console.log("Notification", notif);
+      if (notif && notif.local) {
+        return;
+      }
+      this.sendRemote(notif);
+    });
+
+    this.refreshUnsubscribe = FCM.on("refreshToken", token => {
+      console.log("TOKEN (refreshUnsubscribe)", token);
+      //this.props.onChangeToken(token);
+    });
+  }
+
+  sendRemote(notif) {
+    FCM.presentLocalNotification({
+      title: notif.score,
+      body: notif.time,
+      priority: "high",
+      click_action: notif.click_action,
+      show_in_foreground: true,
+      local: true
+    });
   }
 
   //request permission to access location
@@ -97,6 +134,8 @@ class SetAgent extends Component {
 
   componentWillUnmount() {
    navigator.geolocation.clearWatch(this.watchID);
+   this.refreshUnsubscribe();
+    this.notificationUnsubscribe();
   }
 
   openSearchModal() {

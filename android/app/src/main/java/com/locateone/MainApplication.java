@@ -13,6 +13,7 @@ import com.facebook.react.shell.MainReactPackage;
 import com.cboy.rn.splashscreen.SplashScreenReactPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.joshblour.reactnativepermissions.ReactNativePermissionsPackage;
+import com.evollu.react.fcm.FIRMessagingPackage;
 
 
 
@@ -31,11 +32,12 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new VectorIconsPackage(),
+          new VectorIconsPackage(),
           new RNGooglePlacesPackage(),
           new SplashScreenReactPackage(),
           new MapsPackage(),
-          new ReactNativePermissionsPackage()
+          new ReactNativePermissionsPackage(),
+          new FIRMessagingPackage()
       );
     }
   };
