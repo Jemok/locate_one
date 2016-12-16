@@ -33,7 +33,8 @@ import {
   toogleCreateAccountLoadingSpinner,
   registrationFormData,
   startRegistrationProcess,
-  registerAccount
+  registerAccount,
+  setAppAsOld
 } from '../actions';
 
 import SplashScreen from 'react-native-splash-screen';
@@ -53,6 +54,8 @@ class CreateAccount extends Component {
       this.props.userRegistration(true);
 
       this.props.accountCreation(this.props.locateApplication.registrationFormData);
+
+
   }
 
 
@@ -165,9 +168,12 @@ showFooter(){
         <Container>
           <Header>
 
-            <Button transparent onPress={() => Actions.pop()}>
-                <Icon name="md-arrow-back"></Icon>
-            </Button>
+      
+
+              <Button transparent onPress={() => Actions.pop()}>
+                  <Icon name="md-arrow-back"></Icon>
+              </Button>
+
 
             <Title>
                 Create account
@@ -616,6 +622,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     accountCreation: (formData) => {
       dispatch(registerAccount(formData))
+    },
+    setOld: (status) => {
+      dispatch(setAppAsOld(status))
     }
   }
 }

@@ -1,8 +1,6 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+* Handle all imports
+**/
 
  import {
    AppRegistry,
@@ -10,4 +8,8 @@
 
  import LocateWrapper from './wrapper';
 
+/**
+* Register our Application main component for Android clients
+* The main Application component is called LocateOne
+*/
  AppRegistry.registerComponent('LocateOne', () => LocateWrapper);

@@ -24,7 +24,8 @@ import {
   SET_MY_AGENT_DETAILS,
   SET_REGISTRATION_FORM_DATA,
 	START_REGISTRATION,
-	RECEIVE_PARCELS
+	RECEIVE_PARCELS,
+	SET_APP_AS_OLD
 } from './actions';
 
 
@@ -32,7 +33,7 @@ import {
 * We define our initial Application state tree
 */
 const initialLocateState = {
-		applicationStatus: ApplicationStates.OLD,
+		applicationStatus: ApplicationStates.NEW,
 		agentSettingStatus: AgentSettingStates.NOT_SET,
 		mapSearchStatus: 0,
 		locationPermission: '',
@@ -175,6 +176,10 @@ function locateApplication(state = initialLocateState, action){
 			userParcels: action.userParcels
 		})
 		break;
+		case SET_APP_AS_OLD:
+		return Object.assign({}, state, {
+			applicationStatus: action.applicationStatus
+		})
 		default:
 				return state;
 	}

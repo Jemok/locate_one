@@ -86,6 +86,15 @@ export const START_REGISTRATION = 'START_REGISTRATION';
 */
 export const RECEIVE_PARCELS = 'RECEIVE_PARCELS';
 
+export const SET_APP_AS_OLD = 'SET_APP_AS_OLD';
+
+
+export function setAppAsOld(){
+  return{
+    type: SET_APP_AS_OLD,
+    applicationStatus: ApplicationStates.OLD
+  }
+}
 
 
 /**
@@ -176,6 +185,8 @@ export function registerAccount(action){
         if(response.status == 200){
 
           console.log('gay shiiit!!');
+
+          dispatch(setAppAsOld());
 
           dispatch(startRegistrationProcess(false));
 

@@ -1,3 +1,6 @@
+/**
+* Handle all imports below
+*/
 
 import React, { Component } from 'react';
 import { applyMiddleware, createStore } from 'redux';
@@ -9,7 +12,9 @@ import LocateOne from './app/app';
 
 import { ApplicationStates, setApplicationStatus } from './app/actions';
 
-
+/**
+* Define the constants
+**/
 const logger = createLogger();
 const createStoreWithMiddleware = applyMiddleware(thunk, logger)(createStore);
 const store = createStoreWithMiddleware(rootReducer);

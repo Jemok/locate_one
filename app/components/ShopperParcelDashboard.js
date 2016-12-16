@@ -110,7 +110,7 @@ checkDashboardStatus(){
            <Card >
 
             {this.props.locateApplication.userParcels.map((userParcels) =>
-            <CardItem style={{paddingTop: 1}} onPress={() => Actions.parcel_view({parcelName:"Leather Bag"})}>
+            <CardItem key={userParcels.key} style={{paddingTop: 1}} onPress={() => Actions.parcel_view({parcelName:"Leather Bag"})}>
                 <Thumbnail style={{width: 40, height: 40}} source={require('./parcel_delivery.jpg')} />
                   <View>
                     <Text>
