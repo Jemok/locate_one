@@ -32,6 +32,7 @@ import { connect } from 'react-redux';
 
 import {
   getMyParcels,
+  logOut
 } from '../actions';
 
 
@@ -45,11 +46,6 @@ class ShopperParcelDashboard extends Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      message: 'Try clicking the top-right menus',
-      firstMenuDisabled: false,
-      dropdownSelection: '-- Choose --'
-        }
     }
 
     componentWillMount(){
@@ -58,21 +54,9 @@ class ShopperParcelDashboard extends Component {
 
     }
 
-    setMessage(value) {
-  if (typeof value === 'string') {
-    this.setState({ message: `You selected "${value}"` });
-  } else {
-    this.setState({ message: `Woah!\n\nYou selected an object:\n\n${JSON.stringify(value)}` });
-  }
-  return value !== 'do not close';
-}
-setFirstMenuDisabled(disabled) {
-  this.setState({
-    message: `First menu is ${disabled ? 'disabled' : 'enabled'}`,
-    firstMenuDisabled: disabled
-  });
-  return false;
-}
+    handleLogOut(){
+        this.props.doLogOut();
+    }
 
 checkDashboardStatus(){
 
@@ -107,7 +91,7 @@ checkDashboardStatus(){
           </View>
 
          <View style={{paddingLeft: 10, paddingRight: 10, paddingTop: 15}}>
-           <Card >
+           <Card>
 
             {this.props.locateApplication.userParcels.map((userParcels) =>
             <CardItem key={userParcels.key} style={{paddingTop: 1}} onPress={() => Actions.parcel_view({parcelName:"Leather Bag"})}>
@@ -124,6 +108,12 @@ checkDashboardStatus(){
                     <Text note>
                         {userParcels.merchant}
                     </Text>
+                  </View>
+
+                  <View style={styles.mpesaButton}>
+                    <Button success>
+                      Lipa na Mpesa
+                    </Button>
                   </View>
 
                   <View>
@@ -161,8 +151,8 @@ render() {
             <Title>My Shopper parcels</Title>
         </Header>
         <View style={{marginTop: -40}}>
-        <Menu onSelect={this.setMessage}>
-          <MenuTrigger disabled={this.state.firstMenuDisabled} style={styles.menuTrigger}>
+        <Menu>
+          <MenuTrigger style={styles.menuTrigger}>
 
                   <Icon name="md-more" style={{color: 'white', left: 275}}></Icon>
 
@@ -170,17 +160,23 @@ render() {
           </MenuTrigger>
           <MenuOptions style={styles.menuOptions}>
             <MenuOption value="normal">
-              <Text>Agent request</Text>
+              <Text onPress={() => Actions.send_agent_request()}>Agent request</Text>
             </MenuOption>
-            <MenuOption value="do not close">
-              <Text>Transporter request</Text>
+            <MenuOption value="normal">
+              <Text onPress={() => Actions.agent_request_passed()}>Request(Approved)</Text>
             </MenuOption>
-            <MenuOption value="disabled" disabled={true}>
-              <Text>Settings</Text>
+            <MenuOption value="normal">
+              <Text onPress={() => Actions.agent_request_failed()}>Request(Denied)</Text>
+            </MenuOption>
+            <MenuOption value="normal">
+              <Text onPress={() => Actions.send_transporter_request()}>Transporter request</Text>
+            </MenuOption>
+            <MenuOption value="normal">
+              <Text onPress={() => Actions.settings()} >Settings</Text>
             </MenuOption>
             {/* <View style={styles.divider}/> */}
-            <MenuOption value={{ message: 'Hello World!' }}>
-              <Text>Log out</Text>
+            <MenuOption value="normal">
+              <Text onPress={() => this.handleLogOut()}>Log out</Text>
             </MenuOption>
           </MenuOptions>
         </Menu>
@@ -206,6 +202,9 @@ const mapDispatchToProps = (dispatch) => {
   return {
     getParcels: () => {
       dispatch(getMyParcels())
+    },
+    doLogOut: ()  => {
+      dispatch(logOut())
     }
   }
 }

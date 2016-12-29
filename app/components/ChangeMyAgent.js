@@ -46,14 +46,13 @@ import FCM from 'react-native-fcm';
 
 import SplashScreen from 'react-native-splash-screen';
 
-class SetAgent extends Component {
+class ChangeMyAgent extends Component {
 
   componentWillMount() {
     this.props.getAgents();
   }
 
   componentDidMount() {
-    SplashScreen.hide();
 
     //this.props.fetchLocations();
     Permissions.getPermissionStatus('location')
@@ -199,7 +198,7 @@ getRegisterButtonMessage(){
   if(this.props.locateApplication.agentSettingStatus === 'NOT_SET'){
     return 'SET AN AGENT TO CONTINUE';
   }else {
-    return 'CREATE MY LOCATE ACCOUNT';
+    return 'UPDATE MY AGENT';
   }
 }
 
@@ -230,8 +229,11 @@ render() {
       return (
         <Container>
           <Header>
+          <Button onPress={() => Actions.pop()}>
+                <Icon name='md-arrow-back'/>
+          </Button>
             <Title onPress={() => this.openSearchModal()}>
-                Welcome to Locate
+                Change agent
             </Title>
 
             <Button onPress={() => this.openSearchModal()}>
@@ -274,10 +276,6 @@ render() {
           <Footer>
             <View style={styles.continueButton}>
               <Button disabled={this.checkAgentSettingStatus()} iconRight info onPress={() => Actions.create_account() }>{ this.getRegisterButtonMessage() }</Button>
-            </View>
-
-            <View style={styles.loginButton}>
-              <Button info onPress={() => Actions.login() }> LOGIN </Button>
             </View>
           </Footer>
         </Container>
@@ -351,7 +349,7 @@ search: {
 },
 continueButton:{
   width: 213,
-  left: 10,
+  left: 30,
 },
 loginButton:{
   left: 180
@@ -380,4 +378,4 @@ placeName:{
 }
 });
 
-export default connect(stateToProps, mapDispatchToProps)(SetAgent);
+export default connect(stateToProps, mapDispatchToProps)(ChangeMyAgent);

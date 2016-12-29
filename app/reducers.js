@@ -1,6 +1,8 @@
 
 import { combineReducers } from 'redux';
 
+import routes from './routes';
+
 /**
 * We import our action types from actions.js
 */
@@ -23,9 +25,16 @@ import {
 	RECEIVE_AGENTS,
   SET_MY_AGENT_DETAILS,
   SET_REGISTRATION_FORM_DATA,
+	SET_LOGIN_FORM_DATA,
 	START_REGISTRATION,
+	START_LOGIN,
 	RECEIVE_PARCELS,
-	SET_APP_AS_OLD
+	RECEIVE_AUTHENTICATION_RESPONSE,
+	SET_APP_AS_OLD,
+	SET_LOGIN_ERROR,
+	SET_REDIRECT_URL,
+	SET_USER_AS_LOGGED_IN,
+	LOG_USER_OUT
 } from './actions';
 
 
@@ -41,6 +50,9 @@ const initialLocateState = {
 		placeName: '',
 		isFetchingAgents: true,
 		registrationStarted: false,
+		loginStarted: false,
+		isLoggedIn: false,
+		redirect_url: null,
     region: {
       latitude: InitialMapRegions.LATITUDE ,
       longitude: InitialMapRegions.LONGITUDE ,
@@ -65,6 +77,14 @@ const initialLocateState = {
 			},
 			{
 				field: 'password_confirmation'
+			}
+		],
+		loginFormFields: [
+			{
+				field: 'email'
+			},
+			{
+				field: 'password'
 			}
 		],
 		userParcels: [
@@ -101,6 +121,21 @@ const initialLocateState = {
   ],
 	registrationFormData: [
 
+	],
+	loginFormData: [
+
+	],
+	authenticationResponse: [
+
+	],
+	loginError: [
+
+	],
+	applicationUsers: [
+
+	],
+	currentUser: [
+		
 	]
 }
 
@@ -156,6 +191,11 @@ function locateApplication(state = initialLocateState, action){
 			 markerInfo: action.markerInfo,
 		})
 		break;
+		case RECEIVE_AUTHENTICATION_RESPONSE:
+		return Object.assign({}, state, {
+			 authenticationResponse: action.authenticationResponse,
+		})
+		break;
     case SET_MY_AGENT_DETAILS:
     return Object.assign({}, state, {
        myAgentDetails: action.myAgentDetails,
@@ -166,14 +206,45 @@ function locateApplication(state = initialLocateState, action){
       registrationFormData: action.registrationFormData,
     })
     break;
+		case SET_LOGIN_FORM_DATA:
+		return Object.assign({}, state, {
+			loginFormData: action.loginFormData,
+		})
+		break;
 		case START_REGISTRATION:
 		return Object.assign({}, state, {
 			registrationStarted: action.registrationStarted
 		})
 		break;
+		case START_LOGIN:
+		return Object.assign({}, state, {
+			loginStarted: action.loginStarted
+		})
+		break;
+		case SET_USER_AS_LOGGED_IN:
+		return Object.assign({}, state, {
+			isLoggedIn: action.isLoggedIn
+		})
+		break;
 		case RECEIVE_PARCELS:
 		return Object.assign({}, state, {
 			userParcels: action.userParcels
+		})
+		break;
+		case SET_LOGIN_ERROR:
+		return Object.assign({}, state, {
+			loginError: action.loginError
+		})
+		break;
+		case SET_REDIRECT_URL:
+		return Object.assign({}, state, {
+			redirectUrl: action.redirectUrl
+		})
+		break;
+		case LOG_USER_OUT:
+		return Object.assign({}, state, {
+			isLoggedIn: action.isLoggedIn,
+			authenticationResponse: action.authenticationResponse
 		})
 		break;
 		case SET_APP_AS_OLD:
@@ -188,6 +259,10 @@ function locateApplication(state = initialLocateState, action){
 /*
 * We combine our reducers and export it inorder to create a store
 */
-const rootReducer = combineReducers({locateApplication});
+const rootReducer = combineReducers({
+	locateApplication,
+	routes
+
+});
 
 export default rootReducer;

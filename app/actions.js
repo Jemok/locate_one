@@ -77,9 +77,24 @@ export const SET_MY_AGENT_DETAILS = 'SET_MY_AGENT_DETAILS';
 export const SET_REGISTRATION_FORM_DATA = 'SET_REGISTRATION_FORM_DATA';
 
 /**
+*An action type that sets login data to state
+*/
+export const SET_LOGIN_FORM_DATA = 'SET_LOGIN_FORM_DATA';
+
+/**
 * Start the registration process
 */
 export const START_REGISTRATION = 'START_REGISTRATION';
+
+/**
+*Start the login process
+*/
+export const START_LOGIN = 'START_LOGIN';
+
+/**
+* Receive the authentication response from the server after a user has been logged in
+*/
+export const RECEIVE_AUTHENTICATION_RESPONSE = 'RECEIVE_AUTHENTICATION_RESPONSE';
 
 /**
 *
@@ -88,11 +103,101 @@ export const RECEIVE_PARCELS = 'RECEIVE_PARCELS';
 
 export const SET_APP_AS_OLD = 'SET_APP_AS_OLD';
 
+/*
+* An action that sets the login errors that will be displayed to the user
+*/
+export const SET_LOGIN_ERROR = 'SET_LOGIN_ERROR';
+
+/**
+* An action that sets the current redirect url
+*/
+export const SET_REDIRECT_URL = 'SET_REDIRECT_URL';
+
+/**
+* An action that sets a user as being logged in
+*/
+export const SET_USER_AS_LOGGED_IN = 'SET_USER_AS_LOGGED_IN';
+
+/**
+* An action that logs users out of the application
+*/
+export const LOG_USER_OUT = 'LOG_USER_OUT';
+
+/**
+* An acion to get the current user from the API server
+*/
+export const GET_CURRENT_USER = 'GET_CURRENT_USER';
+
 
 export function setAppAsOld(){
   return{
     type: SET_APP_AS_OLD,
     applicationStatus: ApplicationStates.OLD
+  }
+}
+
+/**
+* Definition of the action that gets the current user from the API server
+*/
+
+export function getCurrentUser(current_user){
+  return{
+    type: GET_CURRENT_USER,
+    currentUser: current_user
+  }
+}
+
+/**
+* Log User out of application action
+*/
+
+export function systemLogOut() {
+  return{
+    type: LOG_USER_OUT,
+    isLoggedIn: false,
+    authenticationResponse: null
+  }
+}
+
+/**
+* Handle logging user out of the application
+*/
+export function logOut() {
+   return function(dispatch) {
+      dispatch(systemLogOut());
+      Actions.set_agent({type: 'reset'});
+   }
+}
+
+
+
+/**
+* Set user as being logged in
+*/
+export function setUserAsLoggedIn(status) {
+  return{
+    type: SET_USER_AS_LOGGED_IN,
+    isLoggedIn: status
+  }
+}
+
+/**
+* Save the current redirect url to the state of the application
+*/
+export function setRedirectUrl(redirect_url){
+  return{
+    type: SET_REDIRECT_URL,
+    redirectUrl: redirect_url
+  }
+}
+
+/**
+* Set Login error action
+*/
+export function setLoginError(login_error) {
+  return {
+    type: SET_LOGIN_ERROR,
+    loginError: login_error
   }
 }
 
@@ -107,6 +212,17 @@ export function startRegistrationProcess(status) {
   }
 
 }
+
+/**
+*Login process action creator
+*/
+export function startUserLoginProcess(status){
+  return{
+    type: START_LOGIN,
+    loginStarted: status
+  }
+}
+
 /**
 * Other constants
 */
@@ -127,6 +243,17 @@ export function registrationFormData(registrationFormData) {
   return {
     type: SET_REGISTRATION_FORM_DATA,
     registrationFormData: registrationFormData
+  }
+}
+
+/**
+*An action that creates login form data
+*/
+
+export function loginFormData(loginFormData){
+  return {
+    type: SET_LOGIN_FORM_DATA,
+    loginFormData: loginFormData
   }
 }
 
@@ -152,6 +279,9 @@ export function receiveAgents(json){
   }
 }
 
+/**
+* Receive parcels from the api
+*/
 export function receiveParcels(json) {
     console.log(json.data);
     return {
@@ -160,8 +290,19 @@ export function receiveParcels(json) {
     }
 }
 
-export function registerAccount(action){
-  console.log(action.name);
+/**
+* Receive the authentication response from the api
+*/
+export function receiveAuthenticationResponse(json){
+  // console.log(json);
+  return {
+    type: RECEIVE_AUTHENTICATION_RESPONSE,
+    authenticationResponse: json
+  }
+}
+
+export function registerAccount(action, agent_details){
+  // console.log('Agent who' +agent_details);
   return function (dispatch) {
     return fetch(`http://192.168.43.4:8000/api/auth/register`, {
       method: 'POST',
@@ -175,25 +316,22 @@ export function registerAccount(action){
         email: action.email,
         phone_number: action.phone_number,
         password: action.password,
-        password_confirmation: action.password_confirmation
+        password_confirmation: action.password_confirmation,
+        agent_id: agent_details.agent_id
       }
     )
     })
     .then(function(response) {
-        console.log('seeeeex');
         console.log(response);
         if(response.status == 200){
-
-          console.log('gay shiiit!!');
 
           dispatch(setAppAsOld());
 
           dispatch(startRegistrationProcess(false));
 
-          Actions.what_is_locate();
+          Actions.login_from_reg({type: 'reset'});
 
         }else{
-          console.log('lesbian shiiit!!');
           throw new Error('Something went wrong on api server!');
         }
     })
@@ -205,6 +343,62 @@ export function registerAccount(action){
         console.error(error);
     });
   }
+}
+
+export function loginUser(action) {
+  return function (dispatch) {
+    return fetch(`http://192.168.43.4:8000/oauth/token`, {
+      method: 'POST',
+      headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(
+        {
+        grant_type : "password",
+	      client_id: 1,
+	      client_secret : "soOkN59RG5KIS8GtorKTgzrjVlFndQfQj6F1HcgQ",
+        username: action.email,
+        password: action.password,
+      }
+    )
+    })
+    .then(response =>
+      response.json().then(json => {
+       if (response.status == 200) {
+
+            dispatch(receiveAuthenticationResponse(json));
+
+            dispatch(startUserLoginProcess(false));
+
+            dispatch(setUserAsLoggedIn(true));
+
+            Actions.shopper_parcel_dashboard({type: 'reset'});
+       }else {
+         dispatch(setLoginError(json));
+       }
+
+
+      // if(response.status == 200){
+      //   Actions.shopper_parcel_dashboard;
+      // }
+      //
+      // response.json().then()
+
+    })
+    // .then(function(data)
+    //  {
+    //     console.log('response here');
+    //     // console.log(data);
+    //     // if(response.status == 200){
+    //
+    //
+    //     // }else{
+    //     //   throw new Error('Something went wrong on api server!');
+    //     // }
+    // });
+  )
+}
 }
 
 export function fetchAgents(action) {
