@@ -32,7 +32,7 @@ class PaymentSettings extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -71,6 +71,9 @@ const styles = StyleSheet.create({
   requestView: {
     marginTop: 40,
     marginLeft: 35
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 

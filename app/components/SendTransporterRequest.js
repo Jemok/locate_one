@@ -30,7 +30,7 @@ class SendTransporterRequest extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -45,7 +45,7 @@ render() {
           </Text>
 
          <View style={styles.requestView}>
-           <Button onPress={() => Actions.agent_request_confirmation()}>
+           <Button success onPress={() => Actions.agent_request_confirmation()}>
              SEND TRANSPORTER REQUEST
            </Button>
          </View>
@@ -76,6 +76,9 @@ const styles = StyleSheet.create({
   requestView: {
     marginTop: 40,
     marginLeft: 35
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 

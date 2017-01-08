@@ -27,7 +27,7 @@ import {
 
 import { connect } from 'react-redux';
 
-class ContactLocate extends Component {
+class MpesaConfirmPayment extends Component {
 
 render() {
     return (
@@ -36,31 +36,26 @@ render() {
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
-          <Title>Contact Locate</Title>
+          <Title>Confirm Payment</Title>
         </Header>
 
         <Content>
           <View>
-            <Text style={styles.moreInfo}>
-            Please describe your problem below
+            <Text style={styles.requestMessage}>
+            Please confirm that you want to give Locate
+            Kshs 4,000 from the number 0712675071
+            Mpesa will notify you on your mobile phone,
+            you should enter your bonga pin when
+            Mpesa sends the notification to your phone, if you dont have a bonga pin
+            you will have to generate it by
+            dialing *535# on your phone before pressing confirm.
             </Text>
+
           </View>
 
           <View style={styles.newContactDetails}>
-            <List>
-                  <ListItem>
-                        <InputGroup>
-                            <Input placeholder="Start describing your problem" />
-                        </InputGroup>
-                    </ListItem>
-            </List>
-
-            <Text style={styles.Faq}>
-              HAVE YOU READ OUR FAQ YET?
-            </Text>
-
-            <Button success onPress={() => Actions.agent_request_assessment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
-                    CHANGE MY EMAIL
+            <Button success onPress={() => Actions.shopper_parcel_dashboard()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
+                    CONFIRM THIS PAYMENT
             </Button>
           </View>
         </Content>
@@ -75,7 +70,6 @@ const stateToProps = (state) => {
       locateApplication: state.locateApplication
  	}
 }
-
 
 // Styles
 const styles = StyleSheet.create({
@@ -108,13 +102,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 300
   },
-  Faq: {
-    marginTop: 20,
-    marginLeft: 40
-  },
   navHeader: {
     backgroundColor: '#3aaf85'
   }
 });
 
-export default connect(stateToProps)(ContactLocate);
+export default connect(stateToProps)(MpesaConfirmPayment);

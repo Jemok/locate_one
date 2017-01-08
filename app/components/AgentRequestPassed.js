@@ -30,7 +30,7 @@ class AgentRequestPassed extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -49,11 +49,11 @@ render() {
             ACCEPT AND CONTINUE
            </Button>
          </View>
-         <View style={styles.rejectTerms}>
+         {/* <View style={styles.rejectTerms}>
            <Button warning onPress={() => Actions.agent_request_confirmation()}>
             REJECT AND CANCEL
            </Button>
-         </View>
+         </View> */}
 
         </Content>
 
@@ -87,6 +87,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginLeft: 90,
     width: 200
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 

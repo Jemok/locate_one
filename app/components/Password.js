@@ -32,16 +32,18 @@ import { connect } from 'react-redux';
 
 import {
   toogleCreateAccountLoadingSpinner,
-  loginFormData,
-  startUserLoginProcess,
-  loginUser,
-  setAppAsOld
+  registrationFormData,
+  startRegistrationProcess,
+  registerAccount,
+  setAppAsOld,
+  showPassword,
+  registrationPasswordData
 } from '../actions';
 
 import SplashScreen from 'react-native-splash-screen';
 
 
-class Login extends Component {
+class Password extends Component {
   constructor(props){
     super(props);
   }
@@ -50,30 +52,35 @@ class Login extends Component {
         SplashScreen.hide();
   }
 
-  onSubmitLoginForm(){
-      this.props.startUserLogin(true);
+  onSubmitRegistrationForm(){
+      this.props.userRegistration(true);
 
-      this.props.loginProcess(this.props.locateApplication.loginFormData, this.props.locateApplication.applicationStatus);
+    //  console.log(registrationFormData);
+
+    console.log(this.props.locateApplication.registrationFormDataPassword);
+
+      this.props.accountCreation(
+          this.props.locateApplication.registrationFormData,
+          this.props.locateApplication.registrationFormDataContact,
+          this.props.locateApplication.registrationFormDataPassword,
+         this.props.locateApplication.myAgentDetails
+       );
   }
-
-
 
   handleFormChange(formData){
   /*
   formData will contain all the values of the form,
   in this example.
-
   formData = {
   first_name:"",
   last_name:"",
   gender: '',  this.setState({formData:formData});
-
   birthday: Date,
   has_accepted_conditions: bool
   }
   */
 
-  this.props.setLoginData(formData)
+  this.props.savePasswordFormData(formData)
 
   // this.setState({formData:formData});
   this.props.onFormChange && this.props.onFormChange(formData);
@@ -128,22 +135,22 @@ checkFieldValidation(field){
 checkFormValidity(){
   let validity;
 
-  console.log(this.props.locateApplication.loginFormFields);
+  //console.log(this.props.locateApplication.createAccountFormFields);
   ((self) => {
 
     if(Object.keys(self.refs).length !== 0){
-        for (var i = 0; i < this.props.locateApplication.loginFormFields.length; i++) {
-          if(self.refs.createAccountForm.refs[this.props.locateApplication.loginFormFields[i].field].valid == true)
+        for (var i = 0; i < this.props.locateApplication.passwordFormFields.length; i++) {
+          if(self.refs.createAccountForm.refs[this.props.locateApplication.passwordFormFields[i].field].valid == true)
           {
             console.log(i);
-            if(i == 1){
+            if(i == 0){
               validity = true;
             }
           }
         }
-
     }
   })(this);
+
 
   return validity;
 
@@ -152,9 +159,9 @@ checkFormValidity(){
   //   return (
   //     <Footer>
   //       <View >
-  //       <Button style={{width: 180}} success onPress={() => this.onSubmitLoginForm()}>
+  //       <Button style={{width: 180}} success onPress={() => this.onSubmitRegistrationForm()}>
   //           <Icon name="ios-checkmark-circle"></Icon>
-  //           LOGIN TO MY ACCOUNT
+  //           CREATE MY ACCOUNT
   //       </Button>
   //       </View>
   //     </Footer>
@@ -166,36 +173,32 @@ checkFormValidity(){
 showSuccessButton(){
   if(this.checkFormValidity() == true){
     return(
-      <Button transparent onPress={() => this.onSubmitLoginForm()}>
+      <Button transparent onPress={() => this.onSubmitRegistrationForm()}>
           <Icon name="md-checkmark"  style={{fontSize: 30}}></Icon>
       </Button>
     );
   }
 }
 
-showLoginError(){
-  if(this.props.locateApplication.loginError.error != null){
-    return(
-      <View style={styles.errorView}>
-      <Text style={styles.errorText}>The user credentials were incorrect</Text>
-      </View>
-    );
-  }
+showMyPassword(value){
+  this.props.viewPassword(value);
 }
 
-showBackButton(){
-  if(this.props.routes.scene.name != "login_from_reg"){
+passwordText(){
+  if(this.props.locateApplication.showPassword){
     return(
-      <Button transparent onPress={() => Actions.pop()}>
-          <Icon name="md-arrow-back"></Icon>
-      </Button>
-    );
+    <Text success style={styles.showPassword} onPress={() => this.showMyPassword(false)}>Show Password</Text>
+    )
+  }else {
+    return(
+    <Text success style={styles.showPassword} onPress={() => this.showMyPassword(true)}>Hide Password</Text>
+  )
   }
 }
 
 showSpinner(){
 
-  if(this.props.locateApplication.loginStarted){
+  if(this.props.locateApplication.registrationStarted){
 
     return (
         <Spinner color='green' />
@@ -203,38 +206,41 @@ showSpinner(){
   }
 }
 
+
   render() {
     return (
         <Container>
           <Header style={styles.navHeader}>
-            {this.showBackButton()}
+              <Button transparent onPress={() => Actions.pop()}>
+                  <Icon name="md-arrow-back"></Icon>
+              </Button>
             <Title>
-                Login
+                Password
             </Title>
+
             {this.showSuccessButton()}
+
           </Header>
           <Content>
-          {/* <View style={{ flex: 1, zIndex: 2 }} >
-            <Spinner visible={this.props.locateApplication.registrationStarted}  textStyle={{color: '#FFF'}} overlayColor="blue"  />
-          </View> */}
+
 
             <View style={styles.accountView}>
               <Text style={styles.accountInfoText}>
-                Login using the form below
+                Password will be used for:
               </Text>
-
               <Text style={styles.accountInfoText}>
-                You must provide your email and password
+              1. Securing your account
               </Text>
-
+              <Text style={styles.accountInfoText}>
+              2. Login into your account
+              </Text>
             </View>
-
             <View style={styles.accountFormView}>
+
 
             <View style={{zIndex: 2 }} >
               {this.showSpinner()}
             </View>
-
       <ScrollView keyboardShouldPersistTaps={true} style={{height:100}}>
       <Form
         style={{paddingLeft:10}}
@@ -243,82 +249,9 @@ showSpinner(){
         onChange={this.handleFormChange.bind(this)}
         >
 
+        <View style={styles.field}>
+        {this.passwordText()}
 
-  <View style={styles.fieldEmail}>
-  <Icon
-   name={this.checkFieldValidation('email')}
-    size={30}
-    style={[
-      {opacity: 0, color:"#61d062", left: 250}
-      ,
-      ((self)=>{
-        //console.log(self.refs.createAccountForm);
-        //i can change the style of the component related to the attibute of example_input_field
-        if(Object.keys(self.refs).length !== 0){
-            if(self.refs.createAccountForm.refs.email.valid == false)
-            {
-              console.log(self.refs.createAccountForm.refs);
-              console.log('email valid is '+ self.refs.createAccountForm.refs.email.valid);
-
-               return {color:'#d52222', opacity: 1}
-            }else if (self.refs.createAccountForm.refs.email.valid == true) {
-              console.log(self.refs.createAccountForm.refs);
-
-              console.log('email valid is'+ self.refs.createAccountForm.refs.email.valid);
-                return {color:'#61d062', opacity: 1}
-            }
-        }
-        }
-      )(this)
-    ]}
-    />
-    </View>
-    <InputField
-    placeholder='Email' // if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
-    ref='email' // used in onChange event to collect
-    keyboardType='email-address'
-    validationFunction={(value)=>{
-     console.log('email value is'+value);
-      /*
-      you can have multiple validators in a single function or an array of functions
-       */
-      if(value == '' || value == undefined){
-        return "Required";
-      }
-      //Initial state is null/undefined
-      if(!value){
-        return true;
-      }
-
-      // Validate emai syntax
-      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-      if(!re.test(value)){
-          return 'Invalid email';
-      }
-      return true;
-    }
-  }
-/>
-<View>
-<Text style={styles.helpText}>
-{((self)=>{
-     if(Object.keys(self.refs).length !== 0){
-       if(self.refs.createAccountForm.refs.email.valid == false){
-          // if(self.refs.createAccountForm.refs.email.validationErrors.length !== 0){
-            return self.refs.createAccountForm.refs.email.validationErrors.join("\n");
-          // }
-       }
-     }
-     // if(!!(self.refs && self.refs.first_name.valid)){
-     // }
-   })(this)}
-</Text>
-</View>
-
-
-
-<View style={styles.field}>
 <Icon
  name={this.checkFieldValidation('password')}
   size={30}
@@ -351,7 +284,7 @@ showSpinner(){
   <InputField
   placeholder='Password' //if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
   ref='password' // used in onChange event to collect
-  secureTextEntry={true}
+  secureTextEntry={this.props.locateApplication.showPassword}
   validationFunction={(value)=>{
    console.log('password value is'+value);
     /*
@@ -403,10 +336,9 @@ showSpinner(){
 </Text>
 </View>
 
-{this.showLoginError()}
+
 
 </Form>
-
 {/* <Text>{JSON.stringify(this.state.formData)}</Text> */}
  </ScrollView>
 </View>
@@ -422,24 +354,26 @@ showSpinner(){
 
 const stateToProps = (state) => {
   return {
-      routes: state.routes,
       locateApplication: state.locateApplication
  	}
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    setLoginData: (formData) => {
-      dispatch(loginFormData(formData))
+    savePasswordFormData: (formData) => {
+      dispatch(registrationPasswordData(formData))
     },
-    startUserLogin: (status) => {
-      dispatch(startUserLoginProcess(status))
+    userRegistration: (status) => {
+      dispatch(startRegistrationProcess(status))
     },
-    loginProcess: (formData, app_status) => {
-      dispatch(loginUser(formData, app_status))
+    accountCreation: (formData, formDataContact, formDataPassword, myAgentDetails) => {
+      dispatch(registerAccount(formData, formDataContact, formDataPassword,  myAgentDetails))
     },
     setOld: (status) => {
       dispatch(setAppAsOld(status))
+    },
+    viewPassword: (status) => {
+      dispatch(showPassword(status))
     }
   }
 }
@@ -447,17 +381,20 @@ const mapDispatchToProps = (dispatch) => {
 // Styles
 const styles = StyleSheet.create({
   accountView: {
-    marginTop: 30,
-    left: 25,
+    marginTop: 20,
+    left: 25
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   },
   accountInfoText: {
     fontSize: 12
   },
   accountFormView: {
-    top: 0,
+    marginTop: 40,
     left: 10,
     width: 290,
-    height: 300
+    height: 200
   },
   termsAndConditions: {
     left: 35
@@ -471,7 +408,7 @@ const styles = StyleSheet.create({
     left: 43
   },
   fieldName: {
-    top: 20
+    top: 15
   },
   fieldEmail:{
     top: 20
@@ -483,15 +420,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold'
   },
-  errorView:{
-    marginLeft: 20
-  },
-  errorText:{
-    color: 'red',
-    fontWeight: 'bold'
-  },
-  navHeader: {
-    backgroundColor: '#3aaf85'
+  showPassword: {
+    alignSelf: 'center',
+    color: '#3aaf85',
+    padding: 20
   }
 });
-export default connect(stateToProps, mapDispatchToProps)(Login);
+export default connect(stateToProps, mapDispatchToProps)(Password);

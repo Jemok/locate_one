@@ -32,7 +32,7 @@ class DeleteMyAccount extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -61,20 +61,20 @@ render() {
             <List>
                   <ListItem>
                       <InputGroup>
-                          <Icon name="ios-person" style={{ color: '#0A69FE' }} />
+                          <Icon name="ios-person" style={{ color: '#3aaf85' }} />
                           <Input placeholder="Email" />
                       </InputGroup>
                   </ListItem>
 
                   <ListItem>
                         <InputGroup>
-                            <Icon name="ios-unlock" style={{ color: '#0A69FE' }} />
+                            <Icon name="ios-unlock" style={{ color: '#3aaf85' }} />
                             <Input placeholder="Password" />
                         </InputGroup>
                   </ListItem>
             </List>
 
-            <Button onPress={() => Actions.agent_request_assessment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
+            <Button success onPress={() => Actions.agent_request_assessment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
                     DELETE MY ACCOUNT
             </Button>
           </View>
@@ -122,6 +122,9 @@ const styles = StyleSheet.create({
   newContactDetails: {
     marginTop: 20,
     width: 300
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 

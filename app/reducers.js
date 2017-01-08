@@ -30,11 +30,20 @@ import {
 	START_LOGIN,
 	RECEIVE_PARCELS,
 	RECEIVE_AUTHENTICATION_RESPONSE,
-	SET_APP_AS_OLD,
+	SET_APP_AS_NEW,
 	SET_LOGIN_ERROR,
 	SET_REDIRECT_URL,
 	SET_USER_AS_LOGGED_IN,
-	LOG_USER_OUT
+	LOG_USER_OUT,
+	TOGGLE_MY_LOCATION_SPINNER,
+	TOGGLE_LOCATION_FAILED_MODAL,
+	TOGGLE_LOCATION_FOUND_MODAL,
+	TOGGLE_AGENT_SET_SUCCESS,
+	CHANGE_CONNECTION_STATUS,
+	SET_FIRST_NAME,
+	SHOW_PASSWORD,
+	SET_REGISTRATION_CONTACT_DATA,
+	SET_REGISTRATION_PASSWORD_DATA
 } from './actions';
 
 
@@ -42,14 +51,20 @@ import {
 * We define our initial Application state tree
 */
 const initialLocateState = {
-		applicationStatus: ApplicationStates.NEW,
+		applicationStatus: ApplicationStates.OLD,
 		agentSettingStatus: AgentSettingStates.NOT_SET,
 		mapSearchStatus: 0,
 		locationPermission: '',
 		showCreateAccountForm: true,
+		getMyLocationSpinner: false,
+		showPassword: true,
+		isConnected: false,
+		agentSet: false,
 		placeName: '',
 		isFetchingAgents: true,
 		registrationStarted: false,
+		locationFailedModal: false,
+		locationFoundModal: false,
 		loginStarted: false,
 		isLoggedIn: false,
 		redirect_url: null,
@@ -64,19 +79,23 @@ const initialLocateState = {
 		createAccountSpinnerState: false,
 		createAccountFormFields: [
 			{
-				field: 'name'
+				field: 'first_name'
 			},
+			{
+				field: 'last_name'
+			}
+		],
+		emailAndPhoneFormFields: [
 			{
 				field: 'email'
 			},
 			{
 				field: 'phone_number'
-			},
+			}
+		],
+		passwordFormFields: [
 			{
 				field: 'password'
-			},
-			{
-				field: 'password_confirmation'
 			}
 		],
 		loginFormFields: [
@@ -122,6 +141,12 @@ const initialLocateState = {
 	registrationFormData: [
 
 	],
+	registrationFormDataContact: [
+
+	],
+	registrationFormDataPassword:[
+
+	],
 	loginFormData: [
 
 	],
@@ -135,7 +160,10 @@ const initialLocateState = {
 
 	],
 	currentUser: [
-		
+
+	],
+	firstName: [
+
 	]
 }
 
@@ -206,6 +234,16 @@ function locateApplication(state = initialLocateState, action){
       registrationFormData: action.registrationFormData,
     })
     break;
+		case SET_REGISTRATION_CONTACT_DATA:
+		return Object.assign({}, state, {
+			registrationFormDataContact: action.registrationFormDataContact,
+		})
+		break;
+		case SET_REGISTRATION_PASSWORD_DATA:
+		return Object.assign({}, state, {
+			registrationFormDataPassword: action.registrationFormDataPassword,
+		})
+		break;
 		case SET_LOGIN_FORM_DATA:
 		return Object.assign({}, state, {
 			loginFormData: action.loginFormData,
@@ -247,7 +285,42 @@ function locateApplication(state = initialLocateState, action){
 			authenticationResponse: action.authenticationResponse
 		})
 		break;
-		case SET_APP_AS_OLD:
+		case TOGGLE_LOCATION_FAILED_MODAL:
+		return Object.assign({}, state, {
+			locationFailedModal: action.locationFailedModal
+		})
+		break;
+		case TOGGLE_LOCATION_FOUND_MODAL:
+		return Object.assign({}, state, {
+			locationFoundModal: action.locationFoundModal
+		})
+		break;
+		case CHANGE_CONNECTION_STATUS:
+		return Object.assign({}, state, {
+			isConnected: action.isConnected,
+		});
+		break;
+		case TOGGLE_MY_LOCATION_SPINNER:
+		return Object.assign({}, state, {
+			getMyLocationSpinner: action.getMyLocationSpinner
+		})
+		break;
+		case TOGGLE_AGENT_SET_SUCCESS:
+		return Object.assign({}, state, {
+			agentSet: action.agentSet
+		})
+		break;
+		case SET_FIRST_NAME:
+		return Object.assign({}, state, {
+			firstName: action.firstName
+		})
+		break;
+		case SHOW_PASSWORD:
+		return Object.assign({}, state, {
+			showPassword: action.showPassword
+		})
+		break;
+		case SET_APP_AS_NEW:
 		return Object.assign({}, state, {
 			applicationStatus: action.applicationStatus
 		})

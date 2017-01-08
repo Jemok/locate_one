@@ -1,12 +1,8 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+* Our main Component
+*/
 
-import React, { Component } from 'react';
-import { Router, Scene } from 'react-native-router-flux';
-
+// Components imports
 import SetAgent from './components/SetAgent';
 import CreateAccount from './components/CreateAccount';
 import ShowSpinner from './components/ShowSpinner';
@@ -37,44 +33,88 @@ import ContactLocate from './components/ContactLocate';
 import Login from './components/Login';
 import EnsureLoggedInContainer from './components/EnsureLoggedInContainer';
 import RootComponent from './components/RootComponent';
+import StartPage from './components/StartPage';
+import EmailAndPhone from './components/EmailAndPhone';
+import Password from './components/Password';
+import MpesaConfirmNumber from './components/MpesaConfirmNumber';
+import MpesaConfirmPayment from './components/MpesaConfirmPayment';
 
+
+
+// imports from dependencies.
+import React, { Component } from 'react';
+import { Router, Scene } from 'react-native-router-flux';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-
-import Menu, { MenuContext} from 'react-native-menu';
-
-
+// import Menu, { MenuContext} from 'react-native-menu';
+import Menu, {
+  MenuContext,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
 import {
   StyleSheet,
 } from 'react-native';
 
+// Constants.
 const RouterWithRedux = connect()(Router);
 
 class LocateOne extends Component {
 
+  // Class constructor.
   constructor(props) {
    super(props)
   }
 
-  checkAppInitialization(){
-    if(this.props.locateApplication.applicationStatus === 'NEW'){
+  // Checks the status of the app on start up.
+  checkIfUserIsLoggedIn(){
+    if(this.props.locateApplication.isLoggedIn){
         return true;
     }
-
     return false;
   }
 
-
-
-
+  // Component render function.
   render() {
     return(
           <MenuContext style={{flex: 1}}>
           <RouterWithRedux hideNavBar={true}>
           <Scene key="root">
 
+
+          <Scene key="start_page"
+                  component={StartPage}
+                  initial={!this.checkIfUserIsLoggedIn()}
+                  duration={0}
+                          />
+          <Scene key="set_agent"
+                  component={SetAgent}
+                  duration={0}/>
+          <Scene key="create_account"
+                  component={CreateAccount}
+                  duration={0}/>
+          <Scene key="email_and_phone"
+                 component={EmailAndPhone}
+                 duration={0}/>
+          <Scene key="password"
+                 component={Password}
+                 duration={0}/>
+          <Scene key="login"
+                  component={Login}
+                  duration={0}
+                  />
+          <Scene key="login_from_reg"
+                  component={Login}
+                  duration={0}
+                          />
+          <Scene key="contact_locate"
+                 component={ContactLocate}
+                 duration={0}
+                 />
           <Scene key="shopper_parcel_dashboard"
                     component={ShopperParcelDashboard}
+                    initial={this.checkIfUserIsLoggedIn()}
                     duration={0}/>
           <Scene key="parcel_view"
                      component={ParcelView}
@@ -165,41 +205,29 @@ class LocateOne extends Component {
                  component={About}
                  duration={0}
                   />
-         <Scene key="contact_locate"
-                component={ContactLocate}
-                duration={0}
-                />
-          <Scene key="set_agent"
-                  component={SetAgent}
-                  initial={this.checkAppInitialization()}
-                  duration={0}/>
-          <Scene key="create_account"
-                  component={CreateAccount}
-                  initial={!this.checkAppInitialization()}
-                  duration={0}/>
-          <Scene key="login"
-                  component={Login}
-                  duration={0}
+          <Scene key="mpesa_confirm_number"
+                 component={MpesaConfirmNumber}
+                 duration={0}
                   />
-          <Scene key="login_from_reg"
-                  component={Login}
+          <Scene key="mpesa_confirm_payment"
+                 component={MpesaConfirmPayment}
                   duration={0}
                           />
           </Scene>
+
           </RouterWithRedux>
           </MenuContext>
 
         );
       }
-    // console.log(this.props.locateApplication.numMarker);
-
 }
 
+// constant that maps application state to the component.
 const stateToProps = (state) => {
   return {
       locateApplication: state.locateApplication
  	}
 }
 
-
+// Create the application and connect it to the redux store.
 export default connect(stateToProps)(LocateOne);

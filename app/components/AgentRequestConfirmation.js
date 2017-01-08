@@ -32,7 +32,7 @@ class AgentRequestConfirmation extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -52,7 +52,7 @@ render() {
           </View>
 
           <View style={styles.confirmContactDetails}>
-            <Button onPress={() => Actions.agent_request_assessment()}>CONFIRM YOUR CONTACT DETAILS</Button>
+            <Button success onPress={() => Actions.agent_request_assessment()}>CONFIRM YOUR CONTACT DETAILS</Button>
 
             <Text style={styles.newContactMessage}>SET NEW CONTACT DETAILS BELOW</Text>
 
@@ -62,20 +62,20 @@ render() {
             <List>
                   <ListItem>
                       <InputGroup>
-                          <Icon name="ios-person" style={{ color: '#0A69FE' }} />
+                          <Icon name="ios-person" style={{ color: '#3aaf85' }} />
                           <Input placeholder="EMAIL" />
                       </InputGroup>
                   </ListItem>
 
                   <ListItem>
                         <InputGroup>
-                            <Icon name="ios-call" style={{ color: '#0A69FE' }} />
+                            <Icon name="ios-call" style={{ color: '#3aaf85' }} />
                             <Input placeholder="PHONE" keyboardType="numeric" />
                         </InputGroup>
                     </ListItem>
             </List>
 
-            <Button onPress={() => Actions.agent_request_assessment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
+            <Button success onPress={() => Actions.agent_request_assessment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
                     SET NEW CONTACT DETAILS
             </Button>
           </View>
@@ -116,6 +116,9 @@ const styles = StyleSheet.create({
   newContactDetails: {
     marginTop: 20,
     width: 300
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 

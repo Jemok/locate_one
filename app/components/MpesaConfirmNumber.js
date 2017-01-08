@@ -27,7 +27,7 @@ import {
 
 import { connect } from 'react-redux';
 
-class ContactLocate extends Component {
+class MpesaConfirmNumber extends Component {
 
 render() {
     return (
@@ -36,31 +36,43 @@ render() {
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
-          <Title>Contact Locate</Title>
+          <Title>Confirm Number</Title>
         </Header>
 
         <Content>
           <View>
-            <Text style={styles.moreInfo}>
-            Please describe your problem below
+            <Text style={styles.requestMessage}>
+            Please confirm that you want to pay Kshs
+            4,000 using the number 0712675071
+            or you can use a different number, set it
+            below:
             </Text>
+
           </View>
+
+          <Button success onPress={() => Actions.mpesa_confirm_payment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 10 }}>
+               CONFIRM AND CONTINUE
+          </Button>
 
           <View style={styles.newContactDetails}>
             <List>
                   <ListItem>
+                      <InputGroup>
+                          <Icon name="md-call" style={{ color: '#3aaf85' }} />
+                          <Input placeholder="New number" />
+                      </InputGroup>
+                  </ListItem>
+
+                  <ListItem>
                         <InputGroup>
-                            <Input placeholder="Start describing your problem" />
+                            <Icon name="md-call" style={{ color: '#3aaf85' }} />
+                            <Input placeholder="Confirm number" />
                         </InputGroup>
-                    </ListItem>
+                  </ListItem>
             </List>
 
-            <Text style={styles.Faq}>
-              HAVE YOU READ OUR FAQ YET?
-            </Text>
-
-            <Button success onPress={() => Actions.agent_request_assessment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
-                    CHANGE MY EMAIL
+            <Button success onPress={() => Actions.mpesa_confirm_payment()} style={{ alignSelf: 'center', marginTop: 20, marginBottom: 20 }}>
+                    SET PAYMENT NUMBER
             </Button>
           </View>
         </Content>
@@ -108,13 +120,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 300
   },
-  Faq: {
-    marginTop: 20,
-    marginLeft: 40
-  },
   navHeader: {
     backgroundColor: '#3aaf85'
   }
 });
 
-export default connect(stateToProps)(ContactLocate);
+export default connect(stateToProps)(MpesaConfirmNumber);

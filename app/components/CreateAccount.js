@@ -38,7 +38,7 @@ import {
 } from '../actions';
 
 import SplashScreen from 'react-native-splash-screen';
-import Spinner from 'react-native-loading-spinner-overlay';
+// import Spinner from 'react-native-loading-spinner-overlay';
 
 
 class CreateAccount extends Component {
@@ -50,11 +50,11 @@ class CreateAccount extends Component {
         SplashScreen.hide();
   }
 
-  onSubmitRegistrationForm(){
-      this.props.userRegistration(true);
-
-      this.props.accountCreation(this.props.locateApplication.registrationFormData, this.props.locateApplication.myAgentDetails);
-  }
+  // onSubmitRegistrationForm(){
+  //     this.props.userRegistration(true);
+  //
+  //     this.props.accountCreation(this.props.locateApplication.registrationFormData, this.props.locateApplication.myAgentDetails);
+  // }
 
 
 
@@ -62,12 +62,10 @@ class CreateAccount extends Component {
   /*
   formData will contain all the values of the form,
   in this example.
-
   formData = {
   first_name:"",
   last_name:"",
   gender: '',  this.setState({formData:formData});
-
   birthday: Date,
   has_accepted_conditions: bool
   }
@@ -125,10 +123,10 @@ checkFieldValidation(field){
 }
 
 
-showFooter(){
+checkFormValidity(){
   let validity;
 
-  console.log(this.props.locateApplication.createAccountFormFields);
+  //console.log(this.props.locateApplication.createAccountFormFields);
   ((self) => {
 
     if(Object.keys(self.refs).length !== 0){
@@ -136,7 +134,7 @@ showFooter(){
           if(self.refs.createAccountForm.refs[this.props.locateApplication.createAccountFormFields[i].field].valid == true)
           {
             console.log(i);
-            if(i == 4){
+            if(i == 1){
               validity = true;
             }
           }
@@ -145,37 +143,55 @@ showFooter(){
     }
   })(this);
 
-  if(validity == true){
-    return (
-      <Footer>
-        <View >
-        <Button style={{width: 180}} success onPress={() => this.onSubmitRegistrationForm()}>
-            <Icon name="ios-checkmark-circle"></Icon>
-            CREATE MY ACCOUNT
-        </Button>
-        </View>
-      </Footer>
-    );
-  }
+
+  return validity;
+
+
+  // if(validity == true){
+  //   return (
+  //     <Footer>
+  //       <View >
+  //       <Button style={{width: 180}} success onPress={() => this.onSubmitRegistrationForm()}>
+  //           <Icon name="ios-checkmark-circle"></Icon>
+  //           CREATE MY ACCOUNT
+  //       </Button>
+  //       </View>
+  //     </Footer>
+  //   );
+  // }
 
 }
+
+showSuccessButton(){
+  if(this.checkFormValidity() == true){
+    return(
+      <Button transparent onPress={() => Actions.email_and_phone()}>
+          <Icon name="md-checkmark"  style={{fontSize: 30}}></Icon>
+      </Button>
+    );
+  }
+}
+
 
 
   render() {
     return (
         <Container>
-          <Header>
+          <Header style={styles.navHeader}>
               <Button transparent onPress={() => Actions.pop()}>
                   <Icon name="md-arrow-back"></Icon>
               </Button>
             <Title>
                 Create account
             </Title>
+
+            {this.showSuccessButton()}
+
           </Header>
           <Content>
-          <View style={{ flex: 1, zIndex: 2 }} >
+          {/* <View style={{ flex: 1, zIndex: 2 }} >
             <Spinner visible={this.props.locateApplication.registrationStarted}  textStyle={{color: '#FFF'}} overlayColor="blue"  />
-          </View>
+          </View> */}
 
             <View style={styles.accountView}>
               <Text style={styles.accountInfoText}>
@@ -199,7 +215,7 @@ showFooter(){
 
         <View style={styles.fieldName}>
         <Icon
-         name={this.checkFieldValidation('name')}
+         name={this.checkFieldValidation('first_name')}
           size={30}
           style={[
             {opacity: 0, color:"#61d062", left: 250}
@@ -208,16 +224,16 @@ showFooter(){
               //console.log(self.refs.createAccountForm);
               //i can change the style of the component related to the attibute of example_input_field
               if(Object.keys(self.refs).length !== 0){
-                  if(self.refs.createAccountForm.refs.name.valid == false)
+                  if(self.refs.createAccountForm.refs.first_name.valid == false)
                   {
                     console.log(self.refs.createAccountForm);
-                    console.log('name valid is '+ self.refs.createAccountForm.refs.name.valid);
+                    console.log('name valid is '+ self.refs.createAccountForm.refs.first_name.valid);
 
                      return {color:'#d52222', opacity: 1}
-                  }else if (self.refs.createAccountForm.refs.name.valid == true) {
+                  }else if (self.refs.createAccountForm.refs.first_name.valid == true) {
                     console.log(self.refs.createAccountForm.refs);
 
-                    console.log('name valid is'+ self.refs.createAccountForm.refs.name.valid);
+                    console.log('name valid is'+ self.refs.createAccountForm.refs.first_name.valid);
                       return {color:'#61d062', opacity: 1}
                   }
 
@@ -229,8 +245,8 @@ showFooter(){
           </View>
           <InputField
 
-          placeholder='Name' // if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
-          ref='name' // used in onChange event to collect
+          placeholder='First Name' // if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
+          ref='first_name' // used in onChange event to collect
 
          validationFunction={(value)=>{
 
@@ -267,10 +283,10 @@ showFooter(){
   <Text style={styles.helpText}>
   {((self)=>{
            if(Object.keys(self.refs).length !== 0){
-             if(self.refs.createAccountForm.refs.name.valid == false){
+             if(self.refs.createAccountForm.refs.first_name.valid == false){
               //  if(self.refs.createAccountForm.refs.name.validationErrors.length !== 0){
                  //console.log(Object.keys(self.refs.createAccountForm.refs.name.validationErrors).length);
-                 return self.refs.createAccountForm.refs.name.validationErrors.join("\n");
+                 return self.refs.createAccountForm.refs.first_name.validationErrors.join("\n");
               //  }
              }
 
@@ -281,9 +297,10 @@ showFooter(){
   </Text>
   </View>
 
-  <View style={styles.fieldEmail}>
+
+  <View style={styles.fieldName}>
   <Icon
-   name={this.checkFieldValidation('email')}
+   name={this.checkFieldValidation('last_name')}
     size={30}
     style={[
       {opacity: 0, color:"#61d062", left: 250}
@@ -292,18 +309,19 @@ showFooter(){
         //console.log(self.refs.createAccountForm);
         //i can change the style of the component related to the attibute of example_input_field
         if(Object.keys(self.refs).length !== 0){
-            if(self.refs.createAccountForm.refs.email.valid == false)
+            if(self.refs.createAccountForm.refs.last_name.valid == false)
             {
-              console.log(self.refs.createAccountForm.refs);
-              console.log('email valid is '+ self.refs.createAccountForm.refs.email.valid);
+              console.log(self.refs.createAccountForm);
+              console.log('name valid is '+ self.refs.createAccountForm.refs.last_name.valid);
 
                return {color:'#d52222', opacity: 1}
-            }else if (self.refs.createAccountForm.refs.email.valid == true) {
+            }else if (self.refs.createAccountForm.refs.last_name.valid == true) {
               console.log(self.refs.createAccountForm.refs);
 
-              console.log('email valid is'+ self.refs.createAccountForm.refs.email.valid);
+              console.log('name valid is'+ self.refs.createAccountForm.refs.last_name.valid);
                 return {color:'#61d062', opacity: 1}
             }
+
         }
         }
       )(this)
@@ -311,14 +329,17 @@ showFooter(){
     />
     </View>
     <InputField
-    placeholder='Email' // if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
-    ref='email' // used in onChange event to collect
-    keyboardType='email-address'
-    validationFunction={(value)=>{
-     console.log('email value is'+value);
+
+    placeholder='Last Name' // if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
+    ref='last_name' // used in onChange event to collect
+
+   validationFunction={(value)=>{
+
+     console.log('name value is '+ value);
       /*
       you can have multiple validators in a single function or an array of functions
        */
+
       if(value == '' || value == undefined){
         return "Required";
       }
@@ -327,12 +348,18 @@ showFooter(){
         return true;
       }
 
-      // Validate emai syntax
-      var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      var words = 255;
 
-      if(!re.test(value)){
-          return 'Invalid email';
+      if(value.length > words){
+        return "Last Name can't be long than "+words+" words.";
       }
+
+      //Check if First Name Contains Numbers
+      var matches = value.match(/\d+/g);
+      if (matches != null) {
+          return "Last Name can't contain numbers";
+      }
+
       return true;
     }
   }
@@ -341,248 +368,17 @@ showFooter(){
 <Text style={styles.helpText}>
 {((self)=>{
      if(Object.keys(self.refs).length !== 0){
-       if(self.refs.createAccountForm.refs.email.valid == false){
-          // if(self.refs.createAccountForm.refs.email.validationErrors.length !== 0){
-            return self.refs.createAccountForm.refs.email.validationErrors.join("\n");
-          // }
+       if(self.refs.createAccountForm.refs.last_name.valid == false){
+        //  if(self.refs.createAccountForm.refs.name.validationErrors.length !== 0){
+           //console.log(Object.keys(self.refs.createAccountForm.refs.name.validationErrors).length);
+           return self.refs.createAccountForm.refs.last_name.validationErrors.join("\n");
+        //  }
        }
+
      }
      // if(!!(self.refs && self.refs.first_name.valid)){
      // }
    })(this)}
-</Text>
-</View>
-
-<View style={styles.field}>
-<Icon
- name={this.checkFieldValidation('phone_number')}
-  size={30}
-  style={[
-    {opacity: 0, color:"#61d062", left: 250}
-    ,
-    ((self)=>{
-      //console.log(self.refs.createAccountForm);
-      //i can change the style of the component related to the attibute of example_input_field
-      if(Object.keys(self.refs).length !== 0){
-          if(self.refs.createAccountForm.refs.phone_number.valid == false)
-          {
-            console.log(self.refs.createAccountForm.refs);
-            console.log('email valid is '+ self.refs.createAccountForm.refs.phone_number.valid);
-
-             return {color:'#d52222', opacity: 1}
-          }else if (self.refs.createAccountForm.refs.phone_number.valid == true) {
-            console.log(self.refs.createAccountForm.refs);
-
-            console.log('email valid is'+ self.refs.createAccountForm.refs.phone_number.valid);
-              return {color:'#61d062', opacity: 1}
-          }
-
-      }
-      }
-    )(this)
-  ]}
-  />
-  </View>
-  <InputField
-
-  //placeholder='Phone ' if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
-  ref='phone_number' // used in onChange event to collect
-  value='254'
-  validationFunction={(value)=>{
-   console.log('phone number value is'+value);
-    /*
-    you can have multiple validators in a single function or an array of functions
-     */
-    if(value == '' || value == undefined){
-      return "Required";
-    }
-
-    //Initial state is null/undefined
-    if(!value){
-      return true;
-    }
-
-    characters = 13;
-    if(value.length > characters){
-      return "Phone number can't be long than "+characters+" characters.";
-    }
-    if(value.length < 13){
-      return "Phone number can't be less than "+characters+" characters.";
-    }
-
-    if (/\D/.test(value)) {
-        return "Phone number can only be numbers";
-    }
-
-     return true;
-  }
-}
-/>
-<View>
-<Text style={styles.helpText}>
-{((self)=>{
-   if(Object.keys(self.refs).length !== 0){
-     if(self.refs.createAccountForm.refs.phone_number.valid == false){
-        // if(self.refs.createAccountForm.refs.email.validationErrors.length !== 0){
-          return self.refs.createAccountForm.refs.phone_number.validationErrors.join("\n");
-        // }
-     }
-   }
-   // if(!!(self.refs && self.refs.first_name.valid)){
-   // }
- })(this)}
-</Text>
-</View>
-
-<View style={styles.field}>
-<Icon
- name={this.checkFieldValidation('password')}
-  size={30}
-  style={[
-    {opacity: 0, color:"#61d062", left: 250}
-    ,
-    ((self)=>{
-      //console.log(self.refs.createAccountForm);
-      //i can change the style of the component related to the attibute of example_input_field
-      if(Object.keys(self.refs).length !== 0){
-          if(self.refs.createAccountForm.refs.password.valid == false)
-          {
-            console.log(self.refs.createAccountForm.refs);
-            console.log('email valid is '+ self.refs.createAccountForm.refs.password.valid);
-
-             return {color:'#d52222', opacity: 1}
-          }else if (self.refs.createAccountForm.refs.password.valid == true) {
-            console.log(self.refs.createAccountForm.refs);
-
-            console.log('password valid is'+ self.refs.createAccountForm.refs.password.valid);
-              return {color:'#61d062', opacity: 1}
-          }
-
-      }
-      }
-    )(this)
-  ]}
-  />
-  </View>
-  <InputField
-  placeholder='Password' //if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
-  ref='password' // used in onChange event to collect
-  secureTextEntry={true}
-  validationFunction={(value)=>{
-   console.log('password value is'+value);
-    /*
-    you can have multiple validators in a single function or an array of functions
-     */
-    if(value == '' || value == undefined){
-      return "Required";
-    }
-    //Initial state is null/undefined
-    if(!value){
-      return true;
-    }
-
-    if(value.length < 6){
-      return "Password must contain at least 6 characters";
-    }
-
-    re = /[0-9]/;
-    if(!re.test(value)) {
-      return "Password must contain at least one number (0-9)!";
-    }
-
-    re = /[a-z]/;
-     if(!re.test(value)) {
-      return  "Password must contain at least one lowercase letter (a-z)!";
-       return false;
-     }
-     re = /[A-Z]/;
-    if(!re.test(value)) {
-      return "Password must contain at least one uppercase letter (A-Z)!";
-    }
-     return true;
-  }
-}
-/>
-<View>
-<Text style={styles.helpText}>
-{((self)=>{
-   if(Object.keys(self.refs).length !== 0){
-     if(self.refs.createAccountForm.refs.password.valid == false){
-        // if(self.refs.createAccountForm.refs.email.validationErrors.length !== 0){
-          return self.refs.createAccountForm.refs.password.validationErrors.join("\n");
-        // }
-     }
-   }
-   // if(!!(self.refs && self.refs.first_name.valid)){
-   // }
- })(this)}
-</Text>
-</View>
-
-<View style={styles.field}>
-<Icon
- name={this.checkFieldValidation('password_confirmation')}
-  size={30}
-  style={[
-    {opacity: 0, color:"#61d062", left: 250}
-    ,
-    ((self)=>{
-      //console.log(self.refs.createAccountForm);
-      //i can change the style of the component related to the attibute of example_input_field
-      if(Object.keys(self.refs).length !== 0){
-          if(self.refs.createAccountForm.refs.password_confirmation.valid == false)
-          {
-            console.log(self.refs.createAccountForm.refs);
-            console.log('email valid is '+ self.refs.createAccountForm.refs.password_confirmation.valid);
-
-             return {color:'#d52222', opacity: 1}
-          }else if (self.refs.createAccountForm.refs.password_confirmation.valid == true) {
-            console.log(self.refs.createAccountForm.refs);
-
-            console.log('password valid is'+ self.refs.createAccountForm.refs.password_confirmation.valid);
-              return {color:'#61d062', opacity: 1}
-          }
-
-      }
-      }
-    )(this)
-  ]}
-  />
-  </View>
-  <InputField
-  placeholder='Repeat password' //if label is present the field is rendered with the value on the left (see First Name example in the gif), otherwise its rendered with textinput at full width (second name in the gif).
-  ref='password_confirmation' // used in onChange event to collect
-  secureTextEntry={true}
-  validationFunction={(value)=>{
-   console.log('repeat password value is'+value);
-    /*
-    you can have multiple validators in a single function or an array of functions
-     */
-    if(value == '' || value == undefined){
-      return "Required";
-    }
-
-    if(this.props.locateApplication.registrationFormData.password !== value){
-      return "Passwords do not match";
-    }
-
-     return true;
-  }
-}
-/>
-<View>
-<Text style={styles.helpText}>
-{((self)=>{
-   if(Object.keys(self.refs).length !== 0){
-     if(self.refs.createAccountForm.refs.password_confirmation.valid == false){
-        // if(self.refs.createAccountForm.refs.email.validationErrors.length !== 0){
-          return self.refs.createAccountForm.refs.password_confirmation.validationErrors.join("\n");
-        // }
-     }
-   }
-   // if(!!(self.refs && self.refs.first_name.valid)){
-   // }
- })(this)}
 </Text>
 </View>
 </Form>
@@ -593,7 +389,7 @@ showFooter(){
 </View>
 
       </Content>
-        {this.showFooter()}
+        {/* {this.showFooter()} */}
         </Container>
     );
   }
@@ -625,16 +421,20 @@ const mapDispatchToProps = (dispatch) => {
 // Styles
 const styles = StyleSheet.create({
   accountView: {
-    left: 25,
+    marginTop: 20,
+    left: 25
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   },
   accountInfoText: {
     fontSize: 12
   },
   accountFormView: {
-    top: 0,
+    marginTop: 20,
     left: 10,
     width: 290,
-    height: 380
+    height: 200
   },
   termsAndConditions: {
     left: 35
@@ -648,7 +448,7 @@ const styles = StyleSheet.create({
     left: 43
   },
   fieldName: {
-    top: 20
+    top: 15
   },
   fieldEmail:{
     top: 20

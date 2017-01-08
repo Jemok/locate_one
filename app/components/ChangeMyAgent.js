@@ -228,15 +228,15 @@ render() {
 
       return (
         <Container>
-          <Header>
-          <Button onPress={() => Actions.pop()}>
+          <Header style={styles.navHeader}>
+          <Button transparent onPress={() => Actions.pop()}>
                 <Icon name='md-arrow-back'/>
           </Button>
             <Title onPress={() => this.openSearchModal()}>
                 Change agent
             </Title>
 
-            <Button onPress={() => this.openSearchModal()}>
+            <Button transparent onPress={() => this.openSearchModal()}>
                   <Icon name='ios-search'/>
             </Button>
           </Header>
@@ -273,9 +273,9 @@ render() {
               </View>
           </Content>
 
-          <Footer>
+          <Footer style={styles.navHeader}>
             <View style={styles.continueButton}>
-              <Button disabled={this.checkAgentSettingStatus()} iconRight info onPress={() => Actions.create_account() }>{ this.getRegisterButtonMessage() }</Button>
+              <Button success disabled={this.checkAgentSettingStatus()} iconRight info onPress={() => Actions.create_account() }>{ this.getRegisterButtonMessage() }</Button>
             </View>
           </Footer>
         </Container>
@@ -375,6 +375,9 @@ placeName:{
   color: 'white',
   backgroundColor: 'red',
   top: -5
+},
+navHeader: {
+  backgroundColor: '#3aaf85'
 }
 });
 

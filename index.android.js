@@ -1,6 +1,6 @@
 /**
-* Handle all imports
-**/
+* Entry point for the Android app.
+*/
 
  import {
    AppRegistry,

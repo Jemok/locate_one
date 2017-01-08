@@ -30,7 +30,7 @@ class AgentRequestFailed extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -91,6 +91,9 @@ const styles = StyleSheet.create({
     marginLeft: 70,
     width: 200
   },
+  navHeader: {
+    backgroundColor: '#3aaf85'
+  }
 });
 
 export default connect(stateToProps)(AgentRequestFailed);

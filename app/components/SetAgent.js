@@ -1,3 +1,8 @@
+/**
+*  Shows setting of agents
+**/
+
+// Imports
 import React, { Component } from 'react';
 import { Actions } from 'react-native-router-flux';
 import {
@@ -7,7 +12,8 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
-  ToastAndroid
+  ToastAndroid,
+  NetInfo
 } from 'react-native';
 
 import {
@@ -20,17 +26,20 @@ import {
   Footer,
   Input,
   InputGroup,
-  Icon
+  Icon,
+  Spinner
 } from 'native-base';
-
-import PriceMarker from './PriceMarker';
-import CustomCallout from './CustomCallout';
-
 import MapView from 'react-native-maps';
 import RNGooglePlaces from 'react-native-google-places';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import Permissions from 'react-native-permissions';
+import FCM from 'react-native-fcm';
+import Modal from 'react-native-root-modal';
+
+
+import PriceMarker from './PriceMarker';
+import CustomCallout from './CustomCallout';
 
 import {
   setNewMapRegion,
@@ -39,42 +48,147 @@ import {
   setAgentStatus,
   requestAgents,
   fetchAgents,
-  setMyAgentDetails
+  setMyAgentDetails,
+  toggleMyLocationSpinner,
+  toggleLocationFailedModal,
+  toggleLocationFoundModal,
+  agentSetSuccess,
+  connectionState
 } from '../actions';
+import RNAndroidLocationEnabler from 'react-native-android-location-enabler';
 
-import FCM from 'react-native-fcm';
-
-import SplashScreen from 'react-native-splash-screen';
 
 class SetAgent extends Component {
 
-  componentWillMount() {
-    this.props.getAgents();
+  getLocation(){
+
+    navigator.geolocation.getCurrentPosition((position) => {
+
+    console.log('my position'+position);
+
+    this.props.setRegion(position.coords.latitude, position.coords.longitude, '');
+    this.props.changeLocationFoundModal(true);
+
+
+  }, error =>
+
+  {this.props.changeLocationFailedModal(true),
+
+  console.log('Location error is' +error)},
+   { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 });
+
+    this.watchID = navigator.geolocation.watchPosition((position) => {
+      this.props.setRegion(position.coords.latitude, position.coords.longitude, '');
+    });
   }
 
-  componentDidMount() {
-    SplashScreen.hide();
+  goToCreateAccount(){
+    this.props.agentSet(false);
 
-    //this.props.fetchLocations();
+    Actions.create_account();
+  }
+
+  showSpinner(){
+
+    if(this.props.locateApplication.getMyLocationSpinner === true){
+
+      return (
+          <Spinner color='green' />
+      );
+    }
+  }
+
+  _handleConnectionChange = (isConnected) => {
+   this.props.changeConnectionState(isConnected);
+ };
+
+  componentDidMount() {
+  //   navigator.geolocation.getCurrentPosition((position) => {
+  //
+  //   console.log('my position'+position);
+  //
+  //   this.props.setRegion(position.coords.latitude, position.coords.longitude, '');
+  //
+  // }, error => console.log(error), { enableHighAccuracy: false, timeout: 20000, maximumAge: 1000 });
+  //
+  //   this.watchID = navigator.geolocation.watchPosition((position) => {
+  //     this.props.setRegion(position.coords.latitude, position.coords.longitude, '');
+  //   });
+
+  //NetInfo.isConnected.addEventListener('change', this._handleConnectionChange);
+
+  NetInfo.isConnected.fetch().then(isConnected => {
+  console.log('First, is ' + (isConnected ? 'online' : 'offline'));
+
+  if(isConnected){
+    //this.props.changeConnectionState(true)
     Permissions.getPermissionStatus('location')
       .then((response) => {
         //response is one of: 'authorized', 'denied', 'restricted', or 'undetermined'
         this.props.setNewLocationPermission(response);
-        console.log('Location Permission is '+response);
-          if(this.props.locateApplication.locationPermission == 'authorized'){
+        console.log('Location Permission for Locatte is '+response);
+          if(this.props.locateApplication.locationPermission === 'authorized'){
+            this.props.changeMyLocationSpinner(true);
+
             navigator.geolocation.getCurrentPosition(
             (position) => {
               console.log(position.coords.latitude, position.coords.longitude);
               this.props.setRegion(position.coords.latitude, position.coords.longitude, '');
+              this.props.changeMyLocationSpinner(false);
+              this.props.changeLocationFoundModal(true);
+
             },
-            (error) => Alert.alert( 'Location access ?',
-             'Locate determines your phone’s location for a better overall app experience.',
-             [
-               {text: 'Go to setings and turn on your location', onPress: () => console.log('permission denied'), style: 'cancel'},
-              //  (this.props.locateApplication.locationPermission == 'undetermined') ?
-                //  {text: 'OK', onPress: this._requestPermission.bind(this)},
-                  // {text: 'Open Settings', onPress: this.handleClick()  }
-             ]),
+            (error) =>
+            // Alert.alert( 'Location access ?',
+            //  'Locate determines your phone’s location for a better overall app experience.',
+            //  [
+            //    {text: 'Go to setings and turn on your location', onPress: () => console.log('permission denied'), style: 'cancel'},
+            //   (this.props.locateApplication.locationPermission == 'undetermined') ?
+            //     {text: 'OK', onPress: this._requestPermission.bind(this)},
+            //     {text: 'Open Settings', onPress: this.handleClick()  }
+            //  ])
+            {
+
+            RNAndroidLocationEnabler.promptForEnableLocationIfNeeded({interval: 10000, fastInterval: 5000})
+            .then(data => {
+              // The user has accepted to enable the location services
+              // data can be :
+              //  - "already-enabled" if the location services has been already enabled
+              //  - "enabled" if user has clicked on OK button in the popup
+              console.log('The location data is'+ data);
+
+              this.props.changeMyLocationSpinner(true);
+              this.getLocation();
+              this.props.changeMyLocationSpinner(false);
+
+
+            }).catch(err => {
+              // The user has not accepted to enable the location services or something went wrong during the process
+              // "err" : { "code" : "ERR00|ERR01|ERR02", "message" : "message"}
+              // codes :
+              //  - ERR00 : The user has clicked on Cancel button in the popup
+              //  - ERR01 : If the Settings change are unavailable
+              //  - ERR02 : If the popup has failed to open
+              console.log('The location error is'+ err);
+
+              this.props.changeMyLocationSpinner(true);
+              this.getLocation();
+              this.props.changeMyLocationSpinner(false);
+            })
+
+          }
+
+            // Alert.alert(
+            //   'Turn on device Location',
+            //   'This will help us to deliver your parcels, enable location access in your device settings then continue ',
+            //   [
+            //     {text: 'No way', onPress: () => console.log('permission denied'), style: 'cancel'},
+            //     // this.props.locateApplication.locationPermission === 'undetermined'?
+            //       {text: 'OK', onPress: this._requestPermission.bind(this)}
+            //       // : {text: 'Open Settings', onPress: Permissions.openSettings}
+            //   ]
+            // )
+             ,
             {enableHighAccuracy: false, timeout: 20000, maximumAge: 1000}
           );
           this.watchID = navigator.geolocation.watchPosition((position) => {
@@ -84,6 +198,17 @@ class SetAgent extends Component {
           });
         }
       }).catch(error => console.log('Failure'));
+  }else {
+    Alert.alert('You are offline',
+    'Locate needs internet access to work efficiently'
+  );
+  }
+});
+
+
+
+
+
 
       FCM.requestPermissions();
 
@@ -109,6 +234,7 @@ class SetAgent extends Component {
       //this.props.onChangeToken(token);
     });
   }
+
 
   sendRemote(notif) {
     FCM.presentLocalNotification({
@@ -136,9 +262,15 @@ class SetAgent extends Component {
    navigator.geolocation.clearWatch(this.watchID);
    this.refreshUnsubscribe();
     this.notificationUnsubscribe();
+    NetInfo.isConnected.removeEventListener('change', this._handleConnectionChange);
+
   }
 
   openSearchModal() {
+
+  this.props.changeLocationFailedModal(false);
+
+
   RNGooglePlaces.openAutocompleteModal()
   .then((place) => {
       console.log(place.name);
@@ -148,7 +280,8 @@ class SetAgent extends Component {
       // suggestions and it is a simplified Google Place object.
   })
   .catch(error => console.log('Failure'));  // error is a Javascript Error object
-}
+ }
+
 
 onPressMarker(markerInfo) {
   console.log(markerInfo.latitude);
@@ -168,6 +301,8 @@ setAgentClicked(action, agent_details){
     this.props.setMyAgent(agent_details);
 
     this.props.setAgent('SET');
+
+    this.props.agentSet(true);
   }
 
   this.showToast(action)
@@ -184,7 +319,7 @@ showToast(action){
   ToastAndroid.showWithGravity(
                  message,
                  ToastAndroid.LONG,
-                 ToastAndroid.CENTER)
+                 ToastAndroid.BOTTOM)
 }
 
 checkAgentSettingStatus(){
@@ -204,6 +339,7 @@ getRegisterButtonMessage(){
 }
 
 render() {
+
     console.log(this.props.locateApplication.markerInfo);
       const markers = this.props.locateApplication.markerInfo.map((markerInfo) =>
         <MapView.Marker
@@ -229,20 +365,103 @@ render() {
 
       return (
         <Container>
-          <Header>
+          <Header style={styles.navHeader}>
+            <Button transparent onPress={() => Actions.pop()} >
+                  <Icon name='md-arrow-back'/>
+            </Button>
+
             <Title onPress={() => this.openSearchModal()}>
-                Welcome to Locate
+                Pick Agent
             </Title>
 
-            <Button onPress={() => this.openSearchModal()}>
-                  <Icon name='ios-search'/>
+            <Button transparent onPress={() => this.openSearchModal()}>
+                  <Icon name='md-search'/>
             </Button>
           </Header>
-          <Content>
-              <Text style={styles.setMapInfoText}>
-              Click an agent on the map.
-              </Text>
+          <Content style={styles.conentView}>
+
+
               <View style ={styles.container}>
+              {/* <LocationChecker  /> */}
+
+              {this.showSpinner()}
+
+              <Modal
+              style={{
+                  top: 100,
+                  right: 10,
+                  bottom: 160,
+                  left: 10,
+                  backgroundColor: 'rgba(0, 0, 0, 0.6)'
+              }}
+
+              visible={this.props.locateApplication.locationFailedModal}
+          >
+            <Text style={styles.modalText}>
+               Location not found
+            </Text>
+
+            <Button success onPress={() => this.openSearchModal()} style={styles.findMyAgent}>
+                  Find my agent
+                  <Icon name='md-search'/>
+            </Button>
+
+
+            <Button success onPress={() => this.props.changeLocationFailedModal(false)} style={styles.scrollMap}>
+                    Scroll  map
+                    <Icon name='md-locate'/>
+            </Button>
+          </Modal>
+
+          <Modal
+          style={{
+              top: 150,
+              right: 10,
+              bottom: 160,
+              left: 10,
+              backgroundColor: 'rgba(0, 0, 0, 0.6)'
+          }}
+
+          visible={this.props.locateApplication.locationFoundModal}
+      >
+        <Text style={styles.locationFoundText}>
+           Location found
+        </Text>
+
+        <Button success onPress={() => this.props.changeLocationFoundModal(false)} style={styles.scrollMapFound}>
+                Scroll map and click your best agent
+                <Icon name='md-locate'/>
+        </Button>
+      </Modal>
+
+      <Modal
+      style={{
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)'
+      }}
+
+      visible={this.props.locateApplication.agentSet}
+  >
+
+
+  <Button  onPress={() => this.props.agentSet(false)} style={styles.changeAgentButton}>
+          Pick another Agent
+          <Icon name='md-create'/>
+
+  </Button>
+
+    <Button success onPress={() => this.goToCreateAccount()} style={styles.continueButton}>
+          Continue to Create Account
+          <Icon name='md-checkmark'/>
+    </Button>
+
+
+  </Modal>
+
+
                 <MapView
                   style={styles.map}
                   region={this.props.locateApplication.region}
@@ -271,7 +490,7 @@ render() {
               </View>
           </Content>
 
-          <Footer>
+          {/* <Footer>
             <View style={styles.continueButton}>
               <Button disabled={this.checkAgentSettingStatus()} iconRight info onPress={() => Actions.create_account() }>{ this.getRegisterButtonMessage() }</Button>
             </View>
@@ -279,7 +498,7 @@ render() {
             <View style={styles.loginButton}>
               <Button info onPress={() => Actions.login() }> LOGIN </Button>
             </View>
-          </Footer>
+          </Footer> */}
         </Container>
     );
   }
@@ -313,6 +532,21 @@ const mapDispatchToProps = (dispatch) => {
     },
     setMyAgent: (agent_details) => {
       dispatch(setMyAgentDetails(agent_details))
+    },
+    changeMyLocationSpinner: (status) => {
+      dispatch(toggleMyLocationSpinner(status))
+    },
+    changeLocationFailedModal: (status) => {
+      dispatch(toggleLocationFailedModal(status))
+    },
+    changeLocationFoundModal: (status) => {
+      dispatch(toggleLocationFoundModal(status))
+    },
+    agentSet: (status) => {
+      dispatch(agentSetSuccess(status))
+    },
+    changeConnectionState: (status) => {
+      dispatch(connectionState(status))
     }
   }
 }
@@ -320,6 +554,12 @@ const mapDispatchToProps = (dispatch) => {
 
 // Styles
 const styles = StyleSheet.create({
+  conentView: {
+    flex: 1
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
+  },
   setMapInfoText: {
     top: 3,
     bottom: 5,
@@ -328,13 +568,8 @@ const styles = StyleSheet.create({
   },
   container: {
   position: 'relative',
-  top: 10,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  height: 373,
-  justifyContent: 'flex-end',
-  alignItems: 'center',
+  height: 500,
+  justifyContent: 'flex-end'
 },
 map: {
   position: 'absolute',
@@ -350,8 +585,8 @@ search: {
   height: 40
 },
 continueButton:{
-  width: 213,
-  left: 10,
+  alignSelf: 'center',
+  marginTop: 70
 },
 loginButton:{
   left: 180
@@ -377,7 +612,35 @@ placeName:{
   color: 'white',
   backgroundColor: 'red',
   top: -5
+},
+modalText: {
+  color: 'white',
+  fontWeight: 'bold',
+  textAlign: 'center'
+},
+locationFoundText: {
+  color: 'white',
+  fontWeight: 'bold',
+  textAlign: 'center',
+  top: 20
+},
+findMyAgent:{
+  alignSelf: 'center',
+  top: 20
+},
+scrollMap:{
+  alignSelf: 'center',
+  marginTop: 100
+},
+scrollMapFound:{
+  alignSelf: 'center',
+  marginTop: 70
+},
+changeAgentButton: {
+  alignSelf: 'center',
+  marginTop: 150
 }
+
 });
 
 export default connect(stateToProps, mapDispatchToProps)(SetAgent);

@@ -1,10 +1,8 @@
-
 'use strict';
 
 import { Dimensions } from 'react-native';
 import fetch from 'isomorphic-fetch';
 import { Actions } from 'react-native-router-flux';
-
 
 /*
 * action types
@@ -76,6 +74,10 @@ export const SET_MY_AGENT_DETAILS = 'SET_MY_AGENT_DETAILS';
 */
 export const SET_REGISTRATION_FORM_DATA = 'SET_REGISTRATION_FORM_DATA';
 
+export const SET_REGISTRATION_CONTACT_DATA = 'SET_REGISTRATION_CONTACT_DATA';
+
+export const SET_REGISTRATION_PASSWORD_DATA = 'SET_PASSWORD_DATA';
+
 /**
 *An action type that sets login data to state
 */
@@ -101,7 +103,7 @@ export const RECEIVE_AUTHENTICATION_RESPONSE = 'RECEIVE_AUTHENTICATION_RESPONSE'
 */
 export const RECEIVE_PARCELS = 'RECEIVE_PARCELS';
 
-export const SET_APP_AS_OLD = 'SET_APP_AS_OLD';
+export const SET_APP_AS_NEW = 'SET_APP_AS_NEW';
 
 /*
 * An action that sets the login errors that will be displayed to the user
@@ -123,16 +125,79 @@ export const SET_USER_AS_LOGGED_IN = 'SET_USER_AS_LOGGED_IN';
 */
 export const LOG_USER_OUT = 'LOG_USER_OUT';
 
+export const CHANGE_CONNECTION_STATUS = 'CHANGE_CONNECTION_STATUS';
+
 /**
 * An acion to get the current user from the API server
 */
 export const GET_CURRENT_USER = 'GET_CURRENT_USER';
 
+export const TOGGLE_MY_LOCATION_SPINNER = 'TOGGLE_MY_LOCATION_SPINNER';
 
-export function setAppAsOld(){
+export const TOGGLE_LOCATION_FAILED_MODAL = 'TOGGLE_LOCATION_FAILED_MODAL';
+
+export const TOGGLE_LOCATION_FOUND_MODAL = 'TOGGLE_LOCATION_FOUND_MODAL';
+
+export const TOGGLE_AGENT_SET_SUCCESS = 'TOGGLE_AGENT_SET_SUCCESS';
+
+export const SET_FIRST_NAME = 'SET_FIRST_NAME';
+
+export const SHOW_PASSWORD = 'SHOW_PASSWORD';
+
+export function showPassword(value){
   return{
-    type: SET_APP_AS_OLD,
-    applicationStatus: ApplicationStates.OLD
+    type: SHOW_PASSWORD,
+    showPassword: value
+  }
+}
+
+export function setFirstName(value){
+  return{
+    type: SET_FIRST_NAME,
+    firstName: value
+  }
+}
+
+
+export function setAppAsNew(status){
+  return{
+    type: SET_APP_AS_NEW,
+    applicationStatus: status
+  }
+}
+
+export function agentSetSuccess(status){
+  return{
+    type: TOGGLE_AGENT_SET_SUCCESS,
+    agentSet: status
+  }
+}
+
+export function connectionState(status){
+  return {
+     type: CHANGE_CONNECTION_STATUS,
+     isConnected: status
+   }
+}
+
+export function toggleLocationFailedModal(status){
+  return{
+    type: TOGGLE_LOCATION_FAILED_MODAL,
+    locationFailedModal: status
+  }
+}
+
+export function toggleLocationFoundModal(status){
+    return{
+      type: TOGGLE_LOCATION_FOUND_MODAL,
+      locationFoundModal: status
+    }
+}
+
+export function toggleMyLocationSpinner(status){
+  return{
+    type: TOGGLE_MY_LOCATION_SPINNER,
+    getMyLocationSpinner: status
   }
 }
 
@@ -165,7 +230,8 @@ export function systemLogOut() {
 export function logOut() {
    return function(dispatch) {
       dispatch(systemLogOut());
-      Actions.set_agent({type: 'reset'});
+      dispatch(setAppAsNew(ApplicationStates.OLD));
+      Actions.start_page({type: 'reset'});
    }
 }
 
@@ -246,6 +312,20 @@ export function registrationFormData(registrationFormData) {
   }
 }
 
+export function registrationContactData(registrationFormData){
+  return{
+    type: SET_REGISTRATION_CONTACT_DATA,
+    registrationFormDataContact: registrationFormData
+  }
+}
+
+export function registrationPasswordData(registrationFormData) {
+  return{
+    type: SET_REGISTRATION_PASSWORD_DATA,
+    registrationFormDataPassword: registrationFormData
+  }
+}
+
 /**
 *An action that creates login form data
 */
@@ -301,7 +381,7 @@ export function receiveAuthenticationResponse(json){
   }
 }
 
-export function registerAccount(action, agent_details){
+export function registerAccount(action, action_contact, action_password, agent_details){
   // console.log('Agent who' +agent_details);
   return function (dispatch) {
     return fetch(`http://192.168.43.4:8000/api/auth/register`, {
@@ -312,11 +392,11 @@ export function registerAccount(action, agent_details){
       },
       body: JSON.stringify(
         {
-        name: action.name,
-        email: action.email,
-        phone_number: action.phone_number,
-        password: action.password,
-        password_confirmation: action.password_confirmation,
+        name: action.first_name,
+        email: action_contact.email,
+        phone_number: action_contact.phone_number,
+        password: action_password.password,
+        password_confirmation: action_password.password,
         agent_id: agent_details.agent_id
       }
     )
@@ -325,10 +405,11 @@ export function registerAccount(action, agent_details){
         console.log(response);
         if(response.status == 200){
 
-          dispatch(setAppAsOld());
+          dispatch(setAppAsNew(ApplicationStates.NEW));
 
           dispatch(startRegistrationProcess(false));
 
+          //dispatch(loginUser()
           Actions.login_from_reg({type: 'reset'});
 
         }else{
@@ -345,7 +426,7 @@ export function registerAccount(action, agent_details){
   }
 }
 
-export function loginUser(action) {
+export function loginUser(action, app_status) {
   return function (dispatch) {
     return fetch(`http://192.168.43.4:8000/oauth/token`, {
       method: 'POST',
@@ -373,7 +454,12 @@ export function loginUser(action) {
 
             dispatch(setUserAsLoggedIn(true));
 
-            Actions.shopper_parcel_dashboard({type: 'reset'});
+            if(app_status === 'NEW'){
+              Actions.what_is_locate({type: 'reset'});
+            }else {
+              Actions.shopper_parcel_dashboard({type: 'reset'});
+            }
+
        }else {
          dispatch(setLoginError(json));
        }

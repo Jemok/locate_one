@@ -30,7 +30,7 @@ class AgentRequestAssessment extends Component {
 render() {
     return (
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -54,7 +54,7 @@ render() {
           </Text>
 
          <View style={styles.requestView}>
-           <Button onPress={() => Actions.shopper_parcel_dashboard()}>
+           <Button success onPress={() => Actions.shopper_parcel_dashboard()}>
              RETURN TO SHOPPER DASHBOARD
            </Button>
          </View>
@@ -85,6 +85,9 @@ const styles = StyleSheet.create({
   requestView: {
     marginTop: 40,
     marginLeft: 35
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 

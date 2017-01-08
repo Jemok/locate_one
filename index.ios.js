@@ -1,9 +1,6 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
+* Entry point of the ios app.
+**/
 import React, { Component } from 'react';
 import {
   AppRegistry,

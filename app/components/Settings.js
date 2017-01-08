@@ -27,12 +27,21 @@ import {
 
 import { connect } from 'react-redux';
 
+import PopupMenu from './PopupMenu';
+
 class Settings extends Component {
+
+  onPopupEvent = (eventName, index) => {
+    if (eventName !== 'itemSelected') return
+    if (index === 0) this.onEdit()
+    else this.onRemove()
+  }
 
 render() {
     return (
+
       <Container>
-        <Header>
+        <Header style={styles.navHeader}>
           <Button transparent onPress={() => Actions.pop()}>
               <Icon name="md-arrow-back"></Icon>
           </Button>
@@ -40,6 +49,8 @@ render() {
         </Header>
 
         <Content>
+        {/* <PopupMenu actions={['Edit', 'Remove']} onPress={this.onPopupEvent} /> */}
+        
             <Card>
                 <CardItem button onPress={() => Actions.account()}>
                     <Text>Account</Text>
@@ -86,6 +97,9 @@ const styles = StyleSheet.create({
   requestView: {
     marginTop: 40,
     marginLeft: 35
+  },
+  navHeader: {
+    backgroundColor: '#3aaf85'
   }
 });
 
